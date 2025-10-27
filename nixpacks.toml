@@ -8,4 +8,4 @@ cmds = ['cd QuiltCalc && npm install']
 cmds = ['cd QuiltCalc && npx expo export --platform web']
 
 [start]
-cmd = 'cd QuiltCalc && npx serve dist/expo -l ${PORT:-8081} -s'
+cmd = 'cd QuiltCalc && npx serve dist -l ${PORT:-8081} -s'
