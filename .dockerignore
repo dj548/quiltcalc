@@ -1,0 +1,12 @@
+node_modules
+npm-debug.log
+.expo
+.expo-shared
+dist
+QuiltCalc/node_modules
+QuiltCalc/.expo
+QuiltCalc/.expo-shared
+QuiltCalc/dist
+.git
+.gitignore
+README.md
