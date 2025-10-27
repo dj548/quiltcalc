@@ -6,7 +6,9 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "build:web": "npx expo export --platform web",
+    "serve": "npx serve dist/expo -p $PORT"
   },
   "dependencies": {
     "@expo/metro-runtime": "~5.0.4",
@@ -31,7 +33,8 @@
     "react-native-safe-area-context": "5.4.0",
     "react-native-screens": "^4.11.1",
     "react-native-svg": "15.11.2",
-    "react-native-web": "^0.20.0"
+    "react-native-web": "^0.20.0",
+    "serve": "^14.2.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"
