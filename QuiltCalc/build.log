@@ -1,0 +1,10 @@
+Starting project at /Users/dantinucci/quiltcalc/QuiltCalc
+Starting Metro Bundler
+warning: Bundler cache is empty, rebuilding (this may take a minute)
+The following packages should be updated for best compatibility with the installed expo version:
+  expo@53.0.12 - expected version: 53.0.13
+  expo-camera@16.1.8 - expected version: ~16.1.9
+Your project may not work correctly until you install the expected versions of the packages.
+Waiting on http://localhost:3001
+Logs for your project will appear below.
+Web Bundled 2844ms index.js (719 modules)
