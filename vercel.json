@@ -1,0 +1,12 @@
+{
+  "buildCommand": "cd QuiltCalc && npm install && npx expo export --platform web",
+  "outputDirectory": "QuiltCalc/dist",
+  "installCommand": "cd QuiltCalc && npm install",
+  "framework": null,
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
