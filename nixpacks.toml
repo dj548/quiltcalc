@@ -5,4 +5,4 @@ nixPkgs = ['nodejs-18_x']
 cmds = ['cd QuiltCalc && npm install']
 
 [start]
-cmd = 'cd QuiltCalc && npx expo start --web --port ${PORT:-8081} --host 0.0.0.0'
+cmd = 'cd QuiltCalc && EXPO_DEVTOOLS_LISTEN_ADDRESS=0.0.0.0 npx expo start --web --port ${PORT:-8081}'
