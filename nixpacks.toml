@@ -1,0 +1,8 @@
+[phases.setup]
+nixPkgs = ['nodejs-18_x']
+
+[phases.install]
+cmds = ['cd QuiltCalc && npm install']
+
+[start]
+cmd = 'cd QuiltCalc && npx expo start --web --port ${PORT:-8081} --host 0.0.0.0'
