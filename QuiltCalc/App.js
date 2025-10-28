@@ -126,7 +126,7 @@ const FractionalInput = ({ label, value, onChange, style }) => {
           <View style={styles.arrowButtons}>
             <IconButton
               icon="chevron-up"
-              size={20}
+              size={18}
               onPress={increment}
               style={styles.arrowButton}
               iconColor={theme.colors.primary}
@@ -139,11 +139,12 @@ const FractionalInput = ({ label, value, onChange, style }) => {
             keyboardType="numeric"
             style={styles.wholeNumberInput}
             maxLength={3}
+            dense
           />
           <View style={styles.arrowButtons}>
             <IconButton
               icon="chevron-down"
-              size={20}
+              size={18}
               onPress={decrement}
               style={styles.arrowButton}
               iconColor={theme.colors.primary}
@@ -266,18 +267,19 @@ const NumberInput = ({ label, value, onChange, style, step = 1, allowDecimal = t
           keyboardType="numeric"
           style={[styles.numberInput, maxDigits === 2 && styles.numberInputNarrow]}
           maxLength={maxDigits}
+          dense
         />
         <View style={styles.arrowButtons}>
           <IconButton
             icon="chevron-up"
-            size={24}
+            size={20}
             onPress={increment}
             style={styles.arrowButtonLarge}
             iconColor={theme.colors.primary}
           />
           <IconButton
             icon="chevron-down"
-            size={24}
+            size={20}
             onPress={decrement}
             style={styles.arrowButtonLarge}
             iconColor={theme.colors.primary}
@@ -1339,19 +1341,20 @@ const styles = StyleSheet.create({
   },
   wholeNumberInput: {
     width: 70,
-    fontSize: 18,
-    minHeight: 48,
+    fontSize: 16,
+    height: 40,
     marginHorizontal: theme.spacing.xs,
   },
   arrowButtons: {
     justifyContent: 'center',
+    gap: -8,
   },
   arrowButton: {
-    margin: 0,
+    margin: -4,
     padding: 0,
   },
   arrowButtonLarge: {
-    margin: 0,
+    margin: -4,
   },
   fractionButton: {
     flexDirection: 'row',
@@ -1363,7 +1366,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     paddingHorizontal: theme.spacing.xs,
     width: 50,
-    minHeight: 48,
+    height: 40,
   },
   fractionButtonText: {
     fontSize: 20,
@@ -1382,10 +1385,10 @@ const styles = StyleSheet.create({
   },
   numberInput: {
     flex: 1,
-    fontSize: 18,
+    fontSize: 16,
     marginRight: theme.spacing.sm,
     maxWidth: 100,
-    minHeight: 48,
+    height: 40,
   },
   numberInputNarrow: {
     maxWidth: 70,
