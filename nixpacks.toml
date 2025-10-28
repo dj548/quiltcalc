@@ -8,4 +8,4 @@ cmds = ['npm install']
 cmds = ['npx expo export --platform web']
 
 [start]
-cmd = 'npx serve dist -l tcp://0.0.0.0:${PORT:-8081} -s'
+cmd = 'npx serve dist --listen 0.0.0.0:${PORT:-8081} --single'
