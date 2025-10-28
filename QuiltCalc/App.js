@@ -647,6 +647,18 @@ export default function App() {
   const [results, setResults] = useState(null);
   const [shouldPulse, setShouldPulse] = useState(true);
 
+  // Mobile detection
+  const [windowDimensions, setWindowDimensions] = useState(Dimensions.get('window'));
+  const isMobile = windowDimensions.width < 768;
+  const isSmallMobile = windowDimensions.width < 480;
+
+  useEffect(() => {
+    const subscription = Dimensions.addEventListener('change', ({ window }) => {
+      setWindowDimensions(window);
+    });
+    return () => subscription?.remove();
+  }, []);
+
   const calculate = () => {
     const width = parseFloat(quiltWidth);
     const length = parseFloat(quiltLength);
@@ -773,20 +785,20 @@ export default function App() {
       <View style={styles.container}>
         <StatusBar style="auto" />
         <ScrollView
-          contentContainerStyle={styles.scrollContent}
+          contentContainerStyle={[styles.scrollContent, isMobile && styles.scrollContentMobile]}
           showsVerticalScrollIndicator={false}
           style={Platform.OS === 'web' ? { height: '100vh' } : {}}
         >
           {/* Main Container Card */}
-          <View style={styles.mainContainer}>
+          <View style={[styles.mainContainer, isMobile && styles.mainContainerMobile]}>
             {/* Header with Logo */}
-            <View style={styles.header}>
+            <View style={[styles.header, isMobile && styles.headerMobile]}>
               <Image
                 source={require('./assets/CW.png')}
-                style={styles.logo}
+                style={[styles.logo, isMobile && styles.logoMobile]}
                 resizeMode="contain"
               />
-              <Text style={styles.subtitle}>Quilt Calculator</Text>
+              <Text style={[styles.subtitle, isMobile && styles.subtitleMobile]}>Quilt Calculator</Text>
               <IconButton
                 icon="refresh"
                 size={24}
@@ -798,9 +810,9 @@ export default function App() {
             </View>
 
             {/* Main Content Area - Settings Left, Diagram Right */}
-            <View style={styles.topSection}>
+            <View style={[styles.topSection, isMobile && styles.topSectionMobile]}>
               {/* Left Side - Settings Panel */}
-              <View style={styles.settingsPanel}>
+              <View style={[styles.settingsPanel, isMobile && styles.settingsPanelMobile]}>
                 <View style={styles.settingsGrid}>
                   {/* Extra Width */}
                   <NumberInput
@@ -896,9 +908,9 @@ export default function App() {
               {/* Right Side - Diagram */}
               <View style={styles.diagramArea}>
                 <View style={[styles.diagramContainer, {
-                  width: Math.max(450, (parseFloat(results?.battingWidth || 50) * 5) * 1.25),
-                  maxWidth: 800,
-                }]}>
+                  width: isMobile ? windowDimensions.width - 32 : Math.max(450, (parseFloat(results?.battingWidth || 50) * 5) * 1.25),
+                  maxWidth: isMobile ? windowDimensions.width - 32 : 800,
+                }, isMobile && styles.diagramContainerMobile]}>
                   {/* Diagram */}
                   <QuiltDiagram
                     quiltWidth={quiltWidth}
@@ -1523,5 +1535,41 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: theme.colors.text,
     lineHeight: 24,
+  },
+
+  // Mobile-specific styles
+  scrollContentMobile: {
+    padding: theme.spacing.sm,
+    paddingBottom: theme.spacing.md,
+  },
+  mainContainerMobile: {
+    padding: theme.spacing.sm,
+  },
+  headerMobile: {
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: theme.spacing.xs,
+    marginBottom: theme.spacing.md,
+    paddingBottom: theme.spacing.sm,
+  },
+  logoMobile: {
+    width: 120,
+    height: 24,
+  },
+  subtitleMobile: {
+    fontSize: 18,
+    marginTop: theme.spacing.xs,
+  },
+  topSectionMobile: {
+    flexDirection: 'column',
+    gap: theme.spacing.md,
+  },
+  settingsPanelMobile: {
+    width: '100%',
+    padding: theme.spacing.md,
+  },
+  diagramContainerMobile: {
+    padding: theme.spacing.md,
+    minHeight: 300,
   },
 });
