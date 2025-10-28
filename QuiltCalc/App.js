@@ -943,7 +943,7 @@ export default function App() {
                   <DraggableInput
                     initialX={0}
                     initialY={0}
-                    style={styles.floatingLengthInput}
+                    style={[styles.floatingLengthInput, isMobile && styles.floatingLengthInputMobile]}
                     stepNumber={2}
                     shouldPulse={shouldPulse}
                   >
@@ -959,7 +959,7 @@ export default function App() {
                 <DraggableInput
                   initialX={0}
                   initialY={0}
-                  style={styles.floatingWidthInput}
+                  style={[styles.floatingWidthInput, isMobile && styles.floatingWidthInputMobile]}
                   stepNumber={1}
                   shouldPulse={shouldPulse}
                 >
@@ -1571,5 +1571,23 @@ const styles = StyleSheet.create({
   diagramContainerMobile: {
     padding: theme.spacing.md,
     minHeight: 300,
+  },
+  floatingWidthInputMobile: {
+    position: 'absolute',
+    top: -10,
+    left: theme.spacing.sm,
+    marginLeft: 0,
+    minWidth: 160,
+    maxWidth: '90%',
+  },
+  floatingLengthInputMobile: {
+    position: 'absolute',
+    right: theme.spacing.sm,
+    left: 'auto',
+    top: '50%',
+    marginLeft: 0,
+    marginTop: -60,
+    minWidth: 160,
+    maxWidth: '90%',
   },
 });
