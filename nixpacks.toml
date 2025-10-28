@@ -2,10 +2,10 @@
 nixPkgs = ['nodejs-18_x']
 
 [phases.install]
-cmds = ['cd QuiltCalc && npm install']
+cmds = ['npm install']
 
 [phases.build]
-cmds = ['cd QuiltCalc && npx expo export --platform web']
+cmds = ['npx expo export --platform web']
 
 [start]
-cmd = 'cd QuiltCalc && npx serve dist -l ${PORT:-8081} -s'
+cmd = 'npx serve dist -l ${PORT:-8081} -s'
