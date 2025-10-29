@@ -291,16 +291,21 @@ const NumberInput = ({ label, value, onChange, style, step = 1, allowDecimal = t
 };
 
 // Dynamic Quilt Diagram Component
-const QuiltDiagram = ({ quiltWidth, quiltLength, battingWidth, battingLength, backingOrientation, backingFabricWidth, backingPieces, extraWidth }) => {
+const QuiltDiagram = ({ quiltWidth, quiltLength, battingWidth, battingLength, backingOrientation, backingFabricWidth, backingPieces, extraWidth, borderWidth }) => {
   const diagramWidth = 450;
   const diagramHeight = 450;
   const padding = 60;
 
   const width = parseFloat(quiltWidth) || 48;
   const length = parseFloat(quiltLength) || 48;
+  const border = parseFloat(borderWidth) || 0;
   const battingW = parseFloat(battingWidth) || width + 6;
   const battingL = parseFloat(battingLength) || length + 6;
   const extra = parseFloat(extraWidth) || 3;
+
+  // Calculate quilt with border dimensions
+  const quiltWithBorderWidth = width + (border * 2);
+  const quiltWithBorderLength = length + (border * 2);
 
   // Calculate scale to fit diagram
   const maxDimension = Math.max(battingW, battingL);
@@ -308,14 +313,18 @@ const QuiltDiagram = ({ quiltWidth, quiltLength, battingWidth, battingLength, ba
 
   const quiltW = width * scale;
   const quiltH = length * scale;
+  const quiltWithBorderW = quiltWithBorderWidth * scale;
+  const quiltWithBorderH = quiltWithBorderLength * scale;
   const battW = battingW * scale;
   const battH = battingL * scale;
 
   // Left justify the diagram vertically centered
   const battingX = padding;
   const battingY = (diagramHeight - battH) / 2;
-  const quiltX = battingX + (battW - quiltW) / 2;
-  const quiltY = battingY + (battH - quiltH) / 2;
+  const quiltWithBorderX = battingX + (battW - quiltWithBorderW) / 2;
+  const quiltWithBorderY = battingY + (battH - quiltWithBorderH) / 2;
+  const quiltX = quiltWithBorderX + (border * scale);
+  const quiltY = quiltWithBorderY + (border * scale);
 
   // Generate quilting pattern lines
   const gridSize = 25;
@@ -397,6 +406,22 @@ const QuiltDiagram = ({ quiltWidth, quiltLength, battingWidth, battingLength, ba
         strokeDasharray="10,5"
         rx="8"
       />
+
+      {/* Border (if border width > 0) */}
+      {border > 0 && (
+        <>
+          <Rect
+            x={quiltWithBorderX}
+            y={quiltWithBorderY}
+            width={quiltWithBorderW}
+            height={quiltWithBorderH}
+            fill="#9B59B6"
+            stroke="#8E44AD"
+            strokeWidth="3"
+            rx="4"
+          />
+        </>
+      )}
 
       {/* Quilt top shadow */}
       <Rect
@@ -646,6 +671,8 @@ export default function App() {
   const [backingOrientation, setBackingOrientation] = useState('vertical');
   const [backingType, setBackingType] = useState('standard'); // 'standard' or 'wideback'
   const [bindingWidth, setBindingWidth] = useState('1.5');
+  const [borderWidth, setBorderWidth] = useState('0');
+  const [borderFabricWidth, setBorderFabricWidth] = useState('43');
   const [results, setResults] = useState(null);
   const [shouldPulse, setShouldPulse] = useState(true);
 
@@ -667,15 +694,21 @@ export default function App() {
     const extra = parseFloat(extraWidth);
     const fabWidth = parseFloat(fabricWidth);
     const backingFabWidth = backingType === 'wideback' ? 108 : parseFloat(backingFabricWidth);
+    const border = parseFloat(borderWidth) || 0;
+    const borderFabWidth = parseFloat(borderFabricWidth);
 
     if (isNaN(width) || isNaN(length) || width <= 0 || length <= 0) {
       setResults({ error: 'Please enter valid quilt dimensions' });
       return;
     }
 
-    // Calculate batting size (add extra on all sides)
-    const battingWidth = width + (extra * 2);
-    const battingLength = length + (extra * 2);
+    // Calculate quilt size with border (if any)
+    const quiltWithBorderWidth = width + (border * 2);
+    const quiltWithBorderLength = length + (border * 2);
+
+    // Calculate batting size (quilt with border + extra on all sides)
+    const battingWidth = quiltWithBorderWidth + (extra * 2);
+    const battingLength = quiltWithBorderLength + (extra * 2);
 
     // Get recommended batting size to buy
     const battingToBuy = getBattingSize(battingWidth, battingLength);
@@ -727,6 +760,29 @@ export default function App() {
     // Round backing yards up to nearest 1/4 yard
     backingYards = Math.ceil(backingYards * 4) / 4;
 
+    // Calculate border (if border width > 0)
+    let borderStrips = 0;
+    let borderYards = 0;
+    let borderInchesNeeded = 0;
+
+    if (border > 0) {
+      // Calculate total length of border strips needed
+      // Top and bottom: quiltWithBorderWidth each
+      // Left and right: quiltWithBorderLength each (including corners)
+      const topBottom = quiltWithBorderWidth * 2;
+      const leftRight = quiltWithBorderLength * 2;
+      borderInchesNeeded = topBottom + leftRight;
+
+      // Calculate strips needed
+      const borderUsableWidth = borderFabWidth - 1; // Account for selvage
+      borderStrips = Math.ceil(borderInchesNeeded / borderUsableWidth);
+      const borderFabricInches = borderStrips * border;
+      borderYards = borderFabricInches / 36;
+
+      // Round up to nearest 1/4 yard
+      borderYards = Math.ceil(borderYards * 4) / 4;
+    }
+
     // Calculate binding
     const bindingW = parseFloat(bindingWidth) || 1.5;
     const battingPerimeter = 2 * (battingWidth + battingLength);
@@ -754,13 +810,18 @@ export default function App() {
       backingFabricWidth: backingFabWidth,
       bindingYards: bindingYardsRounded.toFixed(2),
       bindingStrips: stripsNeeded,
+      borderWidth: border,
+      borderStrips,
+      borderYards: borderYards.toFixed(2),
+      quiltWithBorderWidth: quiltWithBorderWidth.toFixed(1),
+      quiltWithBorderLength: quiltWithBorderLength.toFixed(1),
     });
   };
 
   // Auto-calculate when values change
   useEffect(() => {
     calculate();
-  }, [quiltWidth, quiltLength, extraWidth, fabricWidth, backingFabricWidth, backingOrientation, backingType, bindingWidth]);
+  }, [quiltWidth, quiltLength, extraWidth, fabricWidth, backingFabricWidth, backingOrientation, backingType, bindingWidth, borderWidth, borderFabricWidth]);
 
   const clear = () => {
     setQuiltWidth('48');
@@ -771,6 +832,8 @@ export default function App() {
     setBackingOrientation('vertical');
     setBackingType('standard');
     setBindingWidth('1.5');
+    setBorderWidth('0');
+    setBorderFabricWidth('43');
     setResults(null);
     setShouldPulse(true);
     setTimeout(() => setShouldPulse(false), 3000);
@@ -904,6 +967,30 @@ export default function App() {
                       />
                     </View>
                   </View>
+
+                  {/* Border Width + Border Fabric Width */}
+                  <View style={styles.inlineInputGroup}>
+                    <View style={{ flex: 1 }}>
+                      <NumberInput
+                        label="Border Fabric Width (in)"
+                        value={borderFabricWidth}
+                        onChange={setBorderFabricWidth}
+                        step={1}
+                        allowDecimal={false}
+                        maxDigits={3}
+                      />
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <NumberInput
+                        label="Border Width (in)"
+                        value={borderWidth}
+                        onChange={setBorderWidth}
+                        step={1}
+                        allowDecimal={false}
+                        maxDigits={2}
+                      />
+                    </View>
+                  </View>
                 </View>
               </View>
 
@@ -923,6 +1010,7 @@ export default function App() {
                     backingFabricWidth={results?.backingFabricWidth}
                     backingPieces={results?.backingPieces || 1}
                     extraWidth={extraWidth}
+                    borderWidth={borderWidth}
                   />
 
                   {/* Legend - Bottom of Diagram */}
@@ -931,6 +1019,12 @@ export default function App() {
                       <View style={[styles.legendBox, { backgroundColor: '#FFF5E6', borderColor: theme.colors.accent, borderWidth: 2 }]} />
                       <Text style={styles.legendText}>Quilt Top</Text>
                     </View>
+                    {parseFloat(borderWidth) > 0 && (
+                      <View style={styles.legendItem}>
+                        <View style={[styles.legendBox, { backgroundColor: '#9B59B6', borderColor: '#8E44AD', borderWidth: 2 }]} />
+                        <Text style={styles.legendText}>Border</Text>
+                      </View>
+                    )}
                     <View style={styles.legendItem}>
                       <View style={[styles.legendBox, { backgroundColor: '#E3F2FD', borderColor: theme.colors.primary, borderWidth: 2, borderStyle: 'dashed' }]} />
                       <Text style={styles.legendText}>Batting/Backing</Text>
@@ -1051,6 +1145,29 @@ export default function App() {
                       </View>
                     </View>
                   </View>
+
+                  {/* Border Card - only show if border width > 0 */}
+                  {results.borderWidth > 0 && (
+                    <View style={styles.resultCardCompact}>
+                      <View style={styles.resultHeader}>
+                        <Text style={styles.resultTitleCompact}>Border</Text>
+                      </View>
+                      <View style={styles.resultBody}>
+                        <View style={styles.resultItem}>
+                          <Text style={styles.resultLabelCompact}>Strip Width / Count</Text>
+                          <Text style={styles.resultValueCompact}>{results.borderWidth}" wide</Text>
+                          <Text style={styles.resultSubtext}>{results.borderStrips} strips needed</Text>
+                        </View>
+                        <View style={styles.highlightBox}>
+                          <View style={styles.fabricRow}>
+                            <Text style={styles.highlightLabelCompact}>Fabric</Text>
+                            <Text style={styles.incrementText}>¼ yard increments</Text>
+                          </View>
+                          <Text style={styles.highlightValueCompact}>{results.borderYards} yds</Text>
+                        </View>
+                      </View>
+                    </View>
+                  )}
                 </View>
               )}
             </>
